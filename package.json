@@ -1,0 +1,24 @@
+{
+  "name": "ui-sentinel-agent",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @ui-sentinel/shared-types && npm run build --workspace @ui-sentinel/control-plane",
+    "typecheck": "npm run typecheck --workspace @ui-sentinel/shared-types && npm run typecheck --workspace @ui-sentinel/control-plane",
+    "verify:structure": "node scripts/verify-structure.mjs",
+    "check:services": "node scripts/check-services.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "dotenv": "^16.5.0",
+    "pg": "^8.16.0",
+    "redis": "^5.5.6",
+    "typescript": "^5.8.3"
+  }
+}

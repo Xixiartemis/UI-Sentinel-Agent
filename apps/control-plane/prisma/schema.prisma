@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id        String      @id @default(uuid()) @db.Uuid
+  name      String
+  localPath String      @map("local_path")
+  runs      Run[]
+  chunks    CodeChunk[]
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  @@map("projects")
+}
+
+model CodeChunk {
+  id           String                    @id @default(uuid()) @db.Uuid
+  projectId    String                    @map("project_id") @db.Uuid
+  project      Project                   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  filePath     String                    @map("file_path")
+  chunkType    String                    @map("chunk_type")
+  symbolName   String                    @map("symbol_name")
+  startLine    Int                       @map("start_line")
+  endLine      Int                       @map("end_line")
+  content      String
+  embedding    Unsupported("vector(1536)")?
+  searchVector Unsupported("tsvector")?  @map("search_vector")
+  createdAt    DateTime                  @default(now()) @map("created_at")
+  updatedAt    DateTime                  @updatedAt @map("updated_at")
+
+  @@index([projectId])
+  @@index([filePath])
+  @@map("code_chunks")
+}
+
+model Run {
+  id               String            @id @default(uuid()) @db.Uuid
+  projectId        String            @map("project_id") @db.Uuid
+  project          Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  targetUrl        String            @map("target_url")
+  taskGoal         String            @map("task_goal")
+  status           String            @default("queued")
+  events           RunEvent[]
+  artifacts        Artifact[]
+  diagnosisReports DiagnosisReport[]
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  @@index([projectId])
+  @@index([status])
+  @@map("runs")
+}
+
+model RunEvent {
+  id        String   @id @default(uuid()) @db.Uuid
+  eventId   String   @map("event_id")
+  runId     String   @map("run_id") @db.Uuid
+  run       Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  sequence  Int      @default(autoincrement())
+  occurredAt DateTime @map("occurred_at")
+  eventType String   @map("event_type")
+  agentName String   @map("agent_name")
+  status    String
+  payloadJson Json   @map("payload_json")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([runId, sequence])
+  @@index([runId, createdAt])
+  @@map("run_events")
+}
+
+model Artifact {
+  id           String   @id @default(uuid()) @db.Uuid
+  runId        String   @map("run_id") @db.Uuid
+  run          Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  artifactType String   @map("artifact_type")
+  storageKey   String   @map("storage_key")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([runId])
+  @@map("artifacts")
+}
+
+model DiagnosisReport {
+  id             String   @id @default(uuid()) @db.Uuid
+  runId          String   @map("run_id") @db.Uuid
+  run            Run      @relation(fields: [runId], references: [id], onDelete: Cascade)
+  summary        String
+  severity       String
+  claims         Json
+  fixSuggestions Json     @map("fix_suggestions")
+  verifierResult Json     @map("verifier_result")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([runId])
+  @@map("diagnosis_reports")
+}
