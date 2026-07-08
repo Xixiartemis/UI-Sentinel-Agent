@@ -176,3 +176,9 @@ npm run build
 npm run typecheck
 node scripts/validate-task3.mjs
 ```
+
+Task 4.5 demo-browser integration validation:
+
+```powershell
+node scripts/validate-task4-5.mjs
+```

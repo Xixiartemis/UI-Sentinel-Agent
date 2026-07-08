@@ -3,7 +3,8 @@ import { spawn } from "node:child_process";
 import path from "node:path";
 
 const root = process.cwd();
-const demoUrl = "http://127.0.0.1:5173/";
+const demoPort = process.env.VALIDATE_TASK5_DEMO_PORT ?? "5273";
+const demoUrl = `http://127.0.0.1:${demoPort}/`;
 const pythonExe = path.join(root, "apps", "python-worker", ".venv", "Scripts", "python.exe");
 const processes = [];
 
@@ -79,7 +80,7 @@ async def main():
         page = await browser.new_page()
         requests = []
         page.on("request", lambda request: requests.append({"method": request.method, "url": request.url}))
-        await page.goto("http://127.0.0.1:5173/", wait_until="networkidle")
+        await page.goto("${demoUrl}", wait_until="networkidle")
         await page.get_by_role("button", name="Login").click()
         await page.wait_for_timeout(500)
         body_text = await page.locator("body").inner_text()
@@ -103,7 +104,7 @@ try {
     throw new Error(`Python worker virtualenv not found: ${pythonExe}`);
   }
 
-  const demo = spawnProcess("npm.cmd", ["run", "dev", "--workspace", "@ui-sentinel/demo-react-app"], {
+  const demo = spawnProcess("npm.cmd", ["run", "dev", "--workspace", "@ui-sentinel/demo-react-app", "--", "--port", demoPort], {
     shell: true,
   });
   await waitForDemo(demo);

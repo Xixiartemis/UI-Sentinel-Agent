@@ -17,7 +17,7 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  const port = Number(process.env.CONTROL_PLANE_PORT ?? 3000);
+  const port = Number(process.env.CONTROL_PLANE_PORT ?? 3100);
   await app.listen(port);
 }
 

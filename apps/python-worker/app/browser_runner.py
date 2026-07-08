@@ -62,6 +62,7 @@ class BrowserRunner:
                 )
 
                 await page.goto(str(request.target_url), wait_until="networkidle")
+                await self._submit_login_form_if_present(page, callback, request.run_id)
 
                 screenshot_path = run_dir / "screenshot_001.png"
                 await page.screenshot(path=str(screenshot_path), full_page=True)
@@ -183,3 +184,26 @@ class BrowserRunner:
 
     def _storage_key(self, path: Path) -> str:
         return path.as_posix()
+
+    async def _submit_login_form_if_present(
+        self,
+        page: Any,
+        callback: EventClient,
+        run_id: str,
+    ) -> None:
+        login_button = page.get_by_role("button", name="Login")
+
+        if await login_button.count() == 0:
+            return
+
+        await callback.post(
+            run_id=run_id,
+            event_type="browser.step",
+            status="running",
+            payload={
+                "action": "click",
+                "target": "Login button",
+            },
+        )
+        await login_button.first.click()
+        await page.wait_for_load_state("networkidle")

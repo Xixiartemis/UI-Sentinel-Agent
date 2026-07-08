@@ -30,7 +30,7 @@ npm run dev --workspace @ui-sentinel/demo-react-app
 Expected URL:
 
 ```text
-http://127.0.0.1:5173/
+http://127.0.0.1:5273/
 ```
 
 The login form is available at the root route. Vite will also serve it for
@@ -41,7 +41,7 @@ The login form is available at the root route. Vite will also serve it for
 Use this app as the Task 4 Browser Worker target URL:
 
 ```text
-http://127.0.0.1:5173/
+http://127.0.0.1:5273/
 ```
 
 Submitting the form calls `POST /api/login`, which returns a fake failure
@@ -50,7 +50,7 @@ response. The request exists so Playwright can capture network evidence.
 ## Validation
 
 1. Start the app.
-2. Open `http://127.0.0.1:5173/`.
+2. Open `http://127.0.0.1:5273/`.
 3. Submit the empty login form.
 4. Confirm `Password is required` is visible.
 5. Confirm `Email is required` is missing.

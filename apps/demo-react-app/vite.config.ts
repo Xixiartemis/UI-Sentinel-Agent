@@ -28,4 +28,7 @@ function fakeLoginApi(): Plugin {
 
 export default defineConfig({
   plugins: [react(), fakeLoginApi()],
+  server: {
+    port: 5273,
+  },
 });
