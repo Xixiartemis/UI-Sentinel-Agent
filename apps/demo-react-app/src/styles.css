@@ -1,0 +1,117 @@
+:root {
+  color: #18202f;
+  background: #eef2f5;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.page-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.38)),
+    #eef2f5;
+}
+
+.login-panel {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 24px;
+  padding: 28px;
+  border: 1px solid #d3dbe3;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 18px 50px rgba(27, 38, 55, 0.14);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #2f6b55;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.intro {
+  margin: 8px 0 0;
+  color: #526174;
+}
+
+.login-form {
+  display: grid;
+  gap: 18px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+label {
+  color: #253144;
+  font-weight: 700;
+}
+
+input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #b8c3cf;
+  border-radius: 6px;
+  color: #18202f;
+  background: #fbfcfd;
+}
+
+input:focus {
+  border-color: #2f6b55;
+  outline: 3px solid rgba(47, 107, 85, 0.18);
+}
+
+button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 6px;
+  color: #ffffff;
+  background: #2f6b55;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #285b49;
+}
+
+.error {
+  margin: 0;
+  color: #b42318;
+  font-weight: 700;
+}
+
+.status {
+  margin: 0;
+  min-height: 24px;
+  color: #526174;
+}
