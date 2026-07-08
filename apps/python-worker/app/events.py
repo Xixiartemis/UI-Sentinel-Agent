@@ -12,8 +12,9 @@ def utc_now_iso() -> str:
 
 
 class EventClient:
-    def __init__(self, callback_url: str) -> None:
+    def __init__(self, callback_url: str, agent: str = "browser") -> None:
         self.callback_url = callback_url
+        self.agent = agent
 
     async def post(
         self,
@@ -27,6 +28,7 @@ class EventClient:
             event_id=f"evt_{uuid4().hex}",
             run_id=run_id,
             timestamp=utc_now_iso(),
+            agent=self.agent,
             type=event_type,
             status=status,
             payload=payload,

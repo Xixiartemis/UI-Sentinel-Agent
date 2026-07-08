@@ -1,8 +1,8 @@
 # Python Worker
 
 Task 4 implements a FastAPI browser worker that uses Playwright directly for the
-MVP. It does not consume BullMQ, does not run Docker, and does not require
-`browser-use` integration yet.
+MVP. Task 6 adds the codebase indexer. The worker does not consume BullMQ and
+does not run Docker.
 
 ## Scope
 
@@ -17,13 +17,16 @@ Implemented:
 - Local artifact storage.
 - Structured `browser.*` event callbacks to the NestJS control plane.
 - `run.failed` event callback on errors.
+- `POST /internal/indexer/run` for indexing React TypeScript source.
+- TypeScript / TSX chunking for files under `src/`.
+- PostgreSQL `code_chunks` replacement per project.
+- Deterministic mock embeddings when `EMBEDDING_API_KEY` is missing.
+- Structured `indexer.*` event callbacks to the NestJS control plane.
 
 Not implemented:
 
-- Codebase indexing.
 - RAG retrieval.
 - Diagnosis or verifier agents.
-- Demo React app.
 - Frontend pages.
 - Auto-fix.
 
@@ -82,6 +85,48 @@ curl -X POST http://127.0.0.1:8000/internal/browser/run `
   }'
 ```
 
+```http
+POST /internal/indexer/run
+```
+
+Example:
+
+```powershell
+curl -X POST http://127.0.0.1:8000/internal/indexer/run `
+  -H "Content-Type: application/json" `
+  -d '{
+    "project_id": "PROJECT_ID",
+    "run_id": "RUN_ID",
+    "local_path": "apps/demo-react-app",
+    "event_callback_url": "http://127.0.0.1:3100/internal/runs/RUN_ID/events"
+  }'
+```
+
+The indexer scans `src/**/*.ts` and `src/**/*.tsx`, excluding folders such as
+`node_modules`, `dist`, `build`, `.git`, and `coverage`, plus `.env` files. It
+does not exclude normal source files only because they contain words like
+`password`, `token`, `key`, or `login`.
+
+Generated chunk types include:
+
+- `file`
+- `component`
+- `function`
+- `hook`
+- `api_module`
+- `validation`
+- `route_or_page`
+
+Task 6 uses deterministic mock embeddings with dimension `1536` unless a real
+embedding provider is configured through:
+
+```dotenv
+EMBEDDING_API_KEY=
+EMBEDDING_BASE_URL=
+EMBEDDING_MODEL=text-embedding-3-small
+EMBEDDING_DIMENSION=1536
+```
+
 ## Validation
 
 1. Start the NestJS control plane:
@@ -119,3 +164,19 @@ Expected event types:
 - `browser.completed`
 
 6. Confirm artifacts exist under `data/artifacts/{run_id}/`.
+
+Task 6 indexer validation from the repository root:
+
+```powershell
+node scripts/validate-task6.mjs
+```
+
+Expected result:
+
+- More than 10 chunks for `apps/demo-react-app`.
+- Login-related chunks are present.
+- Component or validation chunks are present.
+- Embeddings are stored with 1536 dimensions.
+- Historical run events include `indexer.started`, `indexer.file_scanned`,
+  `indexer.chunk_created`, `indexer.embedding_created`, and
+  `indexer.completed`.

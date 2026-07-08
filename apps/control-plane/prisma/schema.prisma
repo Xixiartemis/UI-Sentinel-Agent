@@ -24,11 +24,14 @@ model CodeChunk {
   projectId    String                    @map("project_id") @db.Uuid
   project      Project                   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   filePath     String                    @map("file_path")
+  language     String                    @default("typescript")
   chunkType    String                    @map("chunk_type")
   symbolName   String                    @map("symbol_name")
   startLine    Int                       @map("start_line")
   endLine      Int                       @map("end_line")
   content      String
+  contentHash  String                    @default("") @map("content_hash")
+  metadataJson Json                      @default("{}") @map("metadata_json")
   embedding    Unsupported("vector(1536)")?
   searchVector Unsupported("tsvector")?  @map("search_vector")
   createdAt    DateTime                  @default(now()) @map("created_at")
@@ -36,6 +39,7 @@ model CodeChunk {
 
   @@index([projectId])
   @@index([filePath])
+  @@index([contentHash])
   @@map("code_chunks")
 }
 

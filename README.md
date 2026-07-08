@@ -1,7 +1,7 @@
 # UI Sentinel Agent
 
 UI Sentinel Agent is an MVP frontend quality diagnosis system. The repository is
-currently complete through **Task 4: Python Browser Worker**.
+currently complete through **Task 6: Python Codebase Indexer**.
 
 The current repository provides:
 
@@ -16,11 +16,16 @@ The current repository provides:
 - A NestJS control-plane foundation with Prisma models and basic Projects/Runs
   REST APIs.
 - Structured run event persistence and live Server-Sent Events for active runs.
-- A Python FastAPI browser worker that uses Playwright to capture runtime
-  evidence and post structured browser events back to the control plane.
+- A Python FastAPI worker that uses Playwright to capture runtime evidence and
+  post structured browser events back to the control plane.
+- A deliberate buggy Vite React login demo app for the MVP validation case.
+- A Python codebase indexer that scans the demo React app, chunks TypeScript /
+  TSX source, creates deterministic mock embeddings when no embedding key is
+  configured, stores chunks in PostgreSQL `code_chunks`, and emits structured
+  `indexer.*` events.
 
-RAG indexing, diagnosis, verifier logic, demo app behavior, and frontend screens
-are intentionally left for later tasks.
+Hybrid retrieval, diagnosis, verifier logic, and frontend workspace screens are
+intentionally left for later tasks.
 
 ## Current Mode: External Services
 
@@ -41,8 +46,8 @@ not require Docker to build or typecheck Task 1.
 apps/
   frontend/          # Reserved for Task 9: Vite + React + TypeScript
   control-plane/     # Task 2: NestJS + Prisma API foundation
-  python-worker/     # Task 4: FastAPI + Playwright browser worker
-  demo-react-app/    # Reserved for Task 5: deliberate login validation bug
+  python-worker/     # Task 4/6: FastAPI browser worker and codebase indexer
+  demo-react-app/    # Task 5: deliberate login validation bug
 packages/
   shared-types/      # Shared TypeScript interfaces for API and event contracts
 docker/
@@ -181,4 +186,66 @@ Task 4.5 demo-browser integration validation:
 
 ```powershell
 node scripts/validate-task4-5.mjs
+```
+
+## Demo React App
+
+The Task 5 demo app lives in `apps/demo-react-app` and runs on port `5273` by
+default:
+
+```powershell
+npm run dev --workspace @ui-sentinel/demo-react-app
+```
+
+Expected URL:
+
+```text
+http://127.0.0.1:5273/
+```
+
+The login form intentionally shows `Password is required` for an empty submit
+but does not show `Email is required`. This bug is kept for later retrieval and
+diagnosis tasks.
+
+## Python Codebase Indexer
+
+Task 6 adds the Python worker endpoint:
+
+- `POST /internal/indexer/run`
+
+Request body:
+
+```json
+{
+  "project_id": "PROJECT_ID",
+  "run_id": "RUN_ID",
+  "local_path": "apps/demo-react-app",
+  "event_callback_url": "http://127.0.0.1:3100/internal/runs/RUN_ID/events"
+}
+```
+
+The indexer scans `src/**/*.ts` and `src/**/*.tsx`, excludes generated and
+secret-like files, writes chunks to PostgreSQL `code_chunks`, and emits:
+
+- `indexer.started`
+- `indexer.file_scanned`
+- `indexer.chunk_created`
+- `indexer.embedding_created`
+- `indexer.completed`
+- `indexer.failed`
+
+If `EMBEDDING_API_KEY` is missing, Task 6 uses deterministic mock embeddings
+with the MVP dimension of `1536`.
+
+Apply the Task 6 database patch when using an existing external PostgreSQL
+database:
+
+```powershell
+npx prisma db execute --schema apps/control-plane/prisma/schema.prisma --file apps/control-plane/prisma/task6-code-chunks.sql
+```
+
+Task 6 validation:
+
+```powershell
+node scripts/validate-task6.mjs
 ```

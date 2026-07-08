@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { LoginForm } from "./LoginForm";
+import { LoginForm } from "./components/LoginForm";
 import "./styles.css";
 
 const rootElement = document.getElementById("root");
