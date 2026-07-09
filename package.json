@@ -7,8 +7,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspace @ui-sentinel/shared-types && npm run build --workspace @ui-sentinel/control-plane && npm run build --workspace @ui-sentinel/demo-react-app",
-    "typecheck": "npm run typecheck --workspace @ui-sentinel/shared-types && npm run typecheck --workspace @ui-sentinel/control-plane && npm run typecheck --workspace @ui-sentinel/demo-react-app",
+    "build": "npm run build --workspace @ui-sentinel/shared-types && npm run build --workspace @ui-sentinel/control-plane && npm run build --workspace @ui-sentinel/demo-react-app && npm run build --workspace @ui-sentinel/frontend",
+    "typecheck": "npm run typecheck --workspace @ui-sentinel/shared-types && npm run typecheck --workspace @ui-sentinel/control-plane && npm run typecheck --workspace @ui-sentinel/demo-react-app && npm run typecheck --workspace @ui-sentinel/frontend",
     "verify:structure": "node scripts/verify-structure.mjs",
     "check:services": "node scripts/check-services.mjs"
   },

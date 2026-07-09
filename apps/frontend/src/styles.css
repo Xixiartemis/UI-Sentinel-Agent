@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #172033;
+  background: #f4f6f8;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+input,
+select {
+  min-height: 40px;
+  width: 100%;
+  border: 1px solid #c8d0dc;
+  border-radius: 6px;
+  background: #ffffff;
+  padding: 8px 10px;
+  color: #172033;
+}
+
+input:focus,
+select:focus {
+  border-color: #2f6b55;
+  outline: 3px solid rgba(47, 107, 85, 0.16);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@layer components {
+  .section-kicker {
+    @apply mb-1 text-xs font-semibold uppercase text-accent;
+  }
+
+  .section-title {
+    @apply text-2xl font-semibold text-ink;
+  }
+
+  .primary-action {
+    @apply min-h-10 rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white hover:bg-[#285b49];
+  }
+
+  .secondary-action {
+    @apply min-h-10 rounded-md border border-line bg-white px-4 py-2 text-sm font-semibold text-ink hover:bg-slate-50;
+  }
+
+  .small-action {
+    @apply rounded-md border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:bg-slate-50;
+  }
+
+  .nav-button {
+    @apply rounded-md border border-transparent px-3 py-2 text-sm font-semibold text-muted hover:border-line hover:bg-slate-50;
+  }
+
+  .nav-button-active {
+    @apply border-line bg-slate-100 text-ink;
+  }
+
+  .workspace-grid {
+    @apply grid gap-5 xl:grid-cols-[minmax(300px,0.8fr)_minmax(420px,1.2fr)_minmax(360px,1fr)];
+  }
+
+  .event-payload {
+    @apply mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-words rounded-md bg-white p-2 text-xs text-slate-700;
+  }
+
+  .code-snippet {
+    @apply mt-3 max-h-48 overflow-auto whitespace-pre-wrap rounded-md bg-[#172033] p-3 text-xs text-slate-100;
+  }
+
+  .tab-button {
+    @apply min-h-9 rounded px-2 text-xs font-semibold text-muted hover:bg-white;
+  }
+
+  .tab-button-active {
+    @apply bg-white text-ink shadow-sm;
+  }
+
+  .score-badge {
+    @apply rounded-full border border-line bg-white px-2 py-1 text-xs font-semibold text-ink;
+  }
+
+  .severity-badge {
+    @apply inline-flex rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-semibold uppercase text-amber-900;
+  }
+}

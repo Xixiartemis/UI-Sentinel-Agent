@@ -1,7 +1,7 @@
 # UI Sentinel Agent
 
-UI Sentinel Agent is an MVP frontend quality diagnosis system. The repository is
-currently complete through **Task 8: Diagnosis + Verifier**.
+UI Sentinel Agent is an MVP frontend quality diagnosis system. 当前仓库进度已到
+**Task 9: React Frontend Run Workspace**。
 
 The current repository provides:
 
@@ -28,8 +28,10 @@ The current repository provides:
 - A Python diagnosis service that produces an evidence-backed MVP report,
   verifies every claim against known event/artifact/chunk evidence IDs, persists
   the report, and emits diagnosis events.
+- Vite React 前端工作台：支持项目列表、创建 run、恢复历史事件、连接 SSE，并展示
+  timeline、browser evidence、RAG 和 diagnosis 面板。
 
-Frontend workspace screens are intentionally left for later tasks.
+Task 10 会继续补 end-to-end README 和最终验证。
 
 ## Current Mode: External Services
 
@@ -48,7 +50,7 @@ not require Docker to build or typecheck Task 1.
 
 ```text
 apps/
-  frontend/          # Reserved for Task 9: Vite + React + TypeScript
+  frontend/          # Task 9: Vite React Run Workspace
   control-plane/     # Task 2: NestJS + Prisma API foundation
   python-worker/     # Task 4/6: FastAPI browser worker and codebase indexer
   demo-react-app/    # Task 5: deliberate login validation bug
@@ -336,3 +338,37 @@ checks deterministic report generation and verifier accept/reject behavior.
 browser evidence is collected, demo source is indexed, retrieval returns login
 form code, diagnosis report is persisted, and verifier marks all claims as
 evidence-backed.
+
+## Frontend Workspace
+
+Task 9 在 `apps/frontend` 中新增 Vite React 前端工作台。
+
+运行命令：
+
+```powershell
+npm run dev --workspace @ui-sentinel/frontend
+```
+
+默认访问地址：
+
+```text
+http://127.0.0.1:5173/
+```
+
+前端读取：
+
+```dotenv
+VITE_API_BASE_URL=http://127.0.0.1:3100
+```
+
+已实现页面：
+
+- Dashboard：列出项目、创建项目、进入 Run Workspace。
+- Run Workspace：创建 run、加载历史事件、连接 SSE，展示 agent timeline、browser evidence、Code RAG matches 和 diagnosis report。
+
+前端验证命令：
+
+```powershell
+npm run typecheck --workspace @ui-sentinel/frontend
+npm run build --workspace @ui-sentinel/frontend
+```
