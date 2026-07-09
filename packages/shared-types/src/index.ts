@@ -18,7 +18,9 @@ export type RunEventType =
   | "indexer.completed"
   | "indexer.failed"
   | "rag.retrieved"
+  | "diagnosis.started"
   | "diagnosis.completed"
+  | "diagnosis.failed"
   | "run.completed"
   | "run.failed";
 

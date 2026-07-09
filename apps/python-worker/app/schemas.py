@@ -87,3 +87,44 @@ class RetrievalQueryResponse(BaseModel):
     query: str
     rewritten_queries: list[str]
     matches: list[RetrievalMatch]
+
+
+class DiagnosisRunRequest(BaseModel):
+    project_id: str = Field(min_length=1)
+    run_id: str = Field(min_length=1)
+    task_goal: str = Field(min_length=1)
+    query: str | None = Field(default=None, min_length=1)
+    event_callback_url: HttpUrl | None = None
+    top_k: int = Field(default=5, ge=1, le=20)
+
+
+class DiagnosisClaim(BaseModel):
+    text: str
+    evidence_ids: list[str]
+
+
+class FixSuggestion(BaseModel):
+    file_path: str
+    suggestion: str
+
+
+class VerifierResult(BaseModel):
+    verified: bool
+    unsupported_claims: list[str]
+    missing_evidence: list[str]
+
+
+class DiagnosisReport(BaseModel):
+    summary: str
+    severity: Literal["low", "medium", "high", "critical"]
+    claims: list[DiagnosisClaim]
+    fix_suggestions: list[FixSuggestion]
+    verifier_result: VerifierResult
+
+
+class DiagnosisRunResponse(BaseModel):
+    project_id: str
+    run_id: str
+    report_id: str
+    report: DiagnosisReport
+    mock_llm: bool

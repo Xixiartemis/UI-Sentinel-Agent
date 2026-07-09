@@ -2,7 +2,8 @@
 
 Task 4 implements a FastAPI browser worker that uses Playwright directly for the
 MVP. Task 6 adds the codebase indexer. Task 7 adds hybrid retrieval over indexed
-chunks. The worker does not consume BullMQ and does not run Docker.
+chunks. Task 8 adds diagnosis and verifier logic. The worker does not consume
+BullMQ and does not run Docker.
 
 ## Scope
 
@@ -24,10 +25,12 @@ Implemented:
 - Structured `indexer.*` event callbacks to the NestJS control plane.
 - `POST /internal/retrieval/query` for pgvector + PostgreSQL full-text retrieval.
 - Structured `rag.retrieved` event callbacks to the NestJS control plane.
+- `POST /internal/diagnosis/run` for MVP diagnosis and evidence verification.
+- PostgreSQL `diagnosis_reports` persistence.
+- Structured `diagnosis.*` event callbacks to the NestJS control plane.
 
 Not implemented:
 
-- Diagnosis or verifier agents.
 - Frontend pages.
 - Auto-fix.
 
@@ -167,6 +170,35 @@ final_score = 0.6 * vector_score + 0.4 * keyword_score
 
 No external reranker is used in the MVP.
 
+```http
+POST /internal/diagnosis/run
+```
+
+Example:
+
+```powershell
+curl -X POST http://127.0.0.1:8000/internal/diagnosis/run `
+  -H "Content-Type: application/json" `
+  -d '{
+    "project_id": "PROJECT_ID",
+    "run_id": "RUN_ID",
+    "task_goal": "Diagnose why empty login submit shows password required but not email required.",
+    "query": "LoginForm email password validation",
+    "top_k": 5,
+    "event_callback_url": "http://127.0.0.1:3100/internal/runs/RUN_ID/events"
+  }'
+```
+
+Task 8 uses deterministic mock diagnosis when `LLM_API_KEY` is missing. The
+verifier checks every claim against evidence IDs from:
+
+- historical run events,
+- persisted artifact records,
+- retrieved code chunk IDs.
+
+Claims without evidence IDs, or with evidence IDs that do not exist, are marked
+unsupported.
+
 ## Validation
 
 1. Start the NestJS control plane:
@@ -233,3 +265,26 @@ Expected result:
 - Retrieval returns `src/components/LoginForm.tsx`.
 - Returned match includes valid line numbers and a positive final score.
 - Historical run events include `rag.retrieved`.
+
+Task 8 diagnosis validation from the repository root:
+
+```powershell
+node scripts/validate-task8-offline.mjs
+node scripts/validate-task8.mjs
+```
+
+Offline expected result:
+
+- Mock diagnosis report generation succeeds.
+- Verifier accepts claims backed by known event/chunk evidence IDs.
+- Verifier rejects a claim with a missing evidence ID.
+
+Full external-services expected result:
+
+- Browser evidence is collected from the demo login page.
+- Demo React app source is indexed.
+- Retrieval returns login validation code.
+- Diagnosis report is inserted into `diagnosis_reports`.
+- Verifier marks all claims as evidence-backed.
+- Historical run events include `diagnosis.started`, `rag.retrieved`, and
+  `diagnosis.completed`.

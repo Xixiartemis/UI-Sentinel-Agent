@@ -1,7 +1,7 @@
 # UI Sentinel Agent
 
 UI Sentinel Agent is an MVP frontend quality diagnosis system. The repository is
-currently complete through **Task 7: Retrieval Service**.
+currently complete through **Task 8: Diagnosis + Verifier**.
 
 The current repository provides:
 
@@ -25,9 +25,11 @@ The current repository provides:
   `indexer.*` events.
 - A Python retrieval service that performs pgvector + PostgreSQL full-text
   hybrid search over indexed chunks and emits `rag.retrieved` events.
+- A Python diagnosis service that produces an evidence-backed MVP report,
+  verifies every claim against known event/artifact/chunk evidence IDs, persists
+  the report, and emits diagnosis events.
 
-Diagnosis, verifier logic, and frontend workspace screens are intentionally left
-for later tasks.
+Frontend workspace screens are intentionally left for later tasks.
 
 ## Current Mode: External Services
 
@@ -288,3 +290,49 @@ node scripts/validate-task7.mjs
 
 Expected result: retrieval returns `src/components/LoginForm.tsx` with valid line
 numbers and a positive final score.
+
+## Diagnosis + Verifier
+
+Task 8 adds the Python worker endpoint:
+
+- `POST /internal/diagnosis/run`
+
+Request body:
+
+```json
+{
+  "project_id": "PROJECT_ID",
+  "run_id": "RUN_ID",
+  "task_goal": "Diagnose why empty login submit shows password required but not email required.",
+  "query": "LoginForm email password validation",
+  "top_k": 5,
+  "event_callback_url": "http://127.0.0.1:3100/internal/runs/RUN_ID/events"
+}
+```
+
+The diagnosis service:
+
+- Runs retrieval for code evidence.
+- Reads historical run events and artifact IDs from PostgreSQL.
+- Produces a deterministic MVP diagnosis report when `LLM_API_KEY` is missing.
+- Verifies every claim has at least one evidence ID.
+- Rejects claims whose evidence IDs are not present in run events, artifacts, or
+  retrieved code chunks.
+- Persists the report in PostgreSQL `diagnosis_reports`.
+- Emits `diagnosis.started`, `rag.retrieved`, `diagnosis.completed`, and
+  `diagnosis.failed` on failure.
+
+Task 8 validation:
+
+```powershell
+node scripts/validate-task8-offline.mjs
+node scripts/validate-task8.mjs
+```
+
+`validate-task8-offline.mjs` does not require PostgreSQL or running services. It
+checks deterministic report generation and verifier accept/reject behavior.
+
+`validate-task8.mjs` is the full external-services validation. Expected result:
+browser evidence is collected, demo source is indexed, retrieval returns login
+form code, diagnosis report is persisted, and verifier marks all claims as
+evidence-backed.

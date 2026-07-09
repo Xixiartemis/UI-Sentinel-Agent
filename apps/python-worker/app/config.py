@@ -20,6 +20,9 @@ class Settings(BaseModel):
     embedding_base_url: str | None = os.getenv("EMBEDDING_BASE_URL")
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
     embedding_dimension: int = 1536
+    llm_api_key: str | None = os.getenv("LLM_API_KEY")
+    llm_base_url: str | None = os.getenv("LLM_BASE_URL")
+    llm_model: str = os.getenv("LLM_MODEL", "gpt-4.1-mini")
 
 
 @lru_cache

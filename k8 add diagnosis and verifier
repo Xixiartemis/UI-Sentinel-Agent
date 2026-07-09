@@ -1,0 +1,13 @@
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/python-worker/README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/python-worker/app/config.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/python-worker/app/main.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/python-worker/app/schemas.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'packages/shared-types/src/index.ts', LF will be replaced by CRLF the next time Git touches it
+ README.md                          | 54 [32m++++++++++++++++++++++++++++++++[m[31m--[m
+ apps/python-worker/README.md       | 59 [32m++++++++++++++++++++++++++++++++++++[m[31m--[m
+ apps/python-worker/app/config.py   |  3 [32m++[m
+ apps/python-worker/app/main.py     | 17 [32m+++++++++++[m
+ apps/python-worker/app/schemas.py  | 41 [32m++++++++++++++++++++++++++[m
+ packages/shared-types/src/index.ts |  2 [32m++[m
+ 6 files changed, 171 insertions(+), 5 deletions(-)

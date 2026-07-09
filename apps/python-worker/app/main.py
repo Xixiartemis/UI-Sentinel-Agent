@@ -4,11 +4,14 @@ from fastapi import FastAPI
 
 from .browser_runner import BrowserRunner
 from .config import get_settings
+from .diagnosis import DiagnosisService
 from .indexer import CodebaseIndexer
 from .retrieval import RetrievalService
 from .schemas import (
     BrowserRunRequest,
     BrowserRunResponse,
+    DiagnosisRunRequest,
+    DiagnosisRunResponse,
     IndexerRunRequest,
     IndexerRunResponse,
     RetrievalQueryRequest,
@@ -59,3 +62,17 @@ async def query_retrieval(request: RetrievalQueryRequest) -> RetrievalQueryRespo
         embedding_dimension=settings.embedding_dimension,
     )
     return await retrieval.query(request)
+
+
+@app.post("/internal/diagnosis/run", response_model=DiagnosisRunResponse)
+async def run_diagnosis(request: DiagnosisRunRequest) -> DiagnosisRunResponse:
+    settings = get_settings()
+    if not settings.database_url:
+        raise RuntimeError("DATABASE_URL is required for diagnosis.")
+
+    diagnosis = DiagnosisService(
+        database_url=settings.database_url,
+        embedding_dimension=settings.embedding_dimension,
+        llm_api_key=settings.llm_api_key,
+    )
+    return await diagnosis.run(request)
