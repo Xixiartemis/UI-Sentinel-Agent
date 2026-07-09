@@ -5,11 +5,14 @@ from fastapi import FastAPI
 from .browser_runner import BrowserRunner
 from .config import get_settings
 from .indexer import CodebaseIndexer
+from .retrieval import RetrievalService
 from .schemas import (
     BrowserRunRequest,
     BrowserRunResponse,
     IndexerRunRequest,
     IndexerRunResponse,
+    RetrievalQueryRequest,
+    RetrievalQueryResponse,
 )
 
 
@@ -43,3 +46,16 @@ async def run_indexer(request: IndexerRunRequest) -> IndexerRunResponse:
     )
     workspace_root = Path(__file__).resolve().parents[3]
     return await indexer.run(request, workspace_root)
+
+
+@app.post("/internal/retrieval/query", response_model=RetrievalQueryResponse)
+async def query_retrieval(request: RetrievalQueryRequest) -> RetrievalQueryResponse:
+    settings = get_settings()
+    if not settings.database_url:
+        raise RuntimeError("DATABASE_URL is required for retrieval.")
+
+    retrieval = RetrievalService(
+        database_url=settings.database_url,
+        embedding_dimension=settings.embedding_dimension,
+    )
+    return await retrieval.query(request)

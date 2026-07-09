@@ -59,3 +59,31 @@ class IndexerRunResponse(BaseModel):
     chunk_count: int
     embedding_dimension: int
     mock_embeddings: bool
+
+
+class RetrievalQueryRequest(BaseModel):
+    project_id: str = Field(min_length=1)
+    query: str = Field(min_length=1)
+    run_id: str | None = Field(default=None, min_length=1)
+    event_callback_url: HttpUrl | None = None
+    top_k: int = Field(default=5, ge=1, le=20)
+
+
+class RetrievalMatch(BaseModel):
+    chunk_id: str
+    file_path: str
+    start_line: int
+    end_line: int
+    chunk_type: str
+    symbol_name: str
+    vector_score: float
+    keyword_score: float
+    final_score: float
+    content: str
+
+
+class RetrievalQueryResponse(BaseModel):
+    project_id: str
+    query: str
+    rewritten_queries: list[str]
+    matches: list[RetrievalMatch]

@@ -69,11 +69,19 @@ export interface RetrievalMatch {
   file_path: string;
   start_line: number;
   end_line: number;
-  chunk_type: "component" | "hook" | "file";
+  chunk_type:
+    | "file"
+    | "component"
+    | "function"
+    | "hook"
+    | "api_module"
+    | "validation"
+    | "route_or_page";
   symbol_name: string;
   vector_score: number;
   keyword_score: number;
   final_score: number;
+  content?: string;
 }
 
 export interface RetrievalResult {

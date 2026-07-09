@@ -1,7 +1,7 @@
 # UI Sentinel Agent
 
 UI Sentinel Agent is an MVP frontend quality diagnosis system. The repository is
-currently complete through **Task 6: Python Codebase Indexer**.
+currently complete through **Task 7: Retrieval Service**.
 
 The current repository provides:
 
@@ -23,9 +23,11 @@ The current repository provides:
   TSX source, creates deterministic mock embeddings when no embedding key is
   configured, stores chunks in PostgreSQL `code_chunks`, and emits structured
   `indexer.*` events.
+- A Python retrieval service that performs pgvector + PostgreSQL full-text
+  hybrid search over indexed chunks and emits `rag.retrieved` events.
 
-Hybrid retrieval, diagnosis, verifier logic, and frontend workspace screens are
-intentionally left for later tasks.
+Diagnosis, verifier logic, and frontend workspace screens are intentionally left
+for later tasks.
 
 ## Current Mode: External Services
 
@@ -249,3 +251,40 @@ Task 6 validation:
 ```powershell
 node scripts/validate-task6.mjs
 ```
+
+## Retrieval Service
+
+Task 7 adds the Python worker endpoint:
+
+- `POST /internal/retrieval/query`
+
+Request body:
+
+```json
+{
+  "project_id": "PROJECT_ID",
+  "run_id": "RUN_ID",
+  "query": "LoginForm email password validation",
+  "top_k": 5,
+  "event_callback_url": "http://127.0.0.1:3100/internal/runs/RUN_ID/events"
+}
+```
+
+The retrieval service:
+
+- Rewrites the input query with deterministic MVP query expansions.
+- Runs pgvector search over `code_chunks.embedding`.
+- Runs PostgreSQL full-text search over file path, symbol name, chunk type, and
+  content.
+- Merges scores with `final_score = 0.6 * vector_score + 0.4 * keyword_score`.
+- Returns file path, line numbers, chunk type, symbol name, scores, and content.
+- Emits `rag.retrieved` when `run_id` and `event_callback_url` are provided.
+
+Task 7 validation:
+
+```powershell
+node scripts/validate-task7.mjs
+```
+
+Expected result: retrieval returns `src/components/LoginForm.tsx` with valid line
+numbers and a positive final score.
